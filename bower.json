@@ -1,0 +1,29 @@
+{
+  "name": "gm-elements",
+  "version": "0.0.1",
+  "homepage": "https://github.com/GeodanElements/gm-elements",
+  "description": "Polymer implementation for geodanmaps",
+  "keywords": [
+    "polymer",
+    "geodanmaps"
+  ],
+  "main": [
+    "gm-map.html"
+  ],
+  "authors": [
+    "Tom van Tilburg"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#~1",
+    "paper-elements": "PolymerElements/paper-elements#~1",
+    "iron-elements": "PolymerElements/iron-elements#~1"
+  }
+}
