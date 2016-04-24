@@ -1,13 +1,21 @@
-<link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/paper-item/paper-item.html">
-<link rel="import" href="../bower_components/paper-item/paper-item-body.html">
-<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
-<link rel="import" href="../bower_components/iron-icons/social-icons.html">
-<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
-<link rel="import" href="../bower_components/iron-collapse/iron-collapse.html">
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-item/paper-item.html">
+<link rel="import" href="../paper-item/paper-item-body.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../iron-selector/iron-selector.html">
+<link rel="import" href="../iron-icons/social-icons.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
+<link rel="import" href="../iron-collapse/iron-collapse.html">
 
 <dom-module id="gm-cas-icon">
+	<!--
+	This component will show you a simple account overview based on material design
+	Use as:
+
+	    <gm-cas-icon account="[[account]]"></gm-cas-icon>
+
+	@demo
+	-->
 <style>
 .header {
 	padding: 10px;
@@ -23,10 +31,13 @@
 #accountmenu a {
 	text-decoration: none;
 }
+paper-item {
+	max-width: 250px;
+}
 
 </style>
 <template>
-<paper-item class='header' on-click='toggleLogin'>
+<paper-item class='header' on-click='_toggleLogin'>
 	<template is="dom-if" if="[[!loggedin]]">
 		<paper-item-body two-line>
 			<div>Login</div>
@@ -47,26 +58,19 @@
 	</template>
 
 </paper-item>
-<iron-collapse id="accountmenu" class='collapse-content' opened="{{!loggedin}}">
-	<iron-selector attr-for-selected="name" selected="{{selected}}">
+<iron-collapse id="accountmenu" class='collapse-content' opened="[[!loggedin]]">
 
-		<template is="dom-if" if="{{!loggedin}}">
-			<paper-item class='menu' name='login' on-click='login'>
+		<template is="dom-if" if="[[!loggedin]]">
+			<paper-item class='menu' name='login'>
 				<a href="{{_loginurl(otap)}}?service={{host}}">Inloggen</a>
 			</paper-item>
 		</template>
 
-		<template is="dom-if" if="{{loggedin}}">
-			<paper-item class='menu' name='logout' on-click='logout'>
+		<template is="dom-if" if="[[loggedin]]">
+			<paper-item class='menu' name='logout' on-click='_logout'>
 				Uitloggen
-				<!--
-				U bent ingelogd als lid van <strong>{{account.Organisation}}</strong>
-				<a href="https://services.geodan.nl/geocas/cas-logout.jsp?forwardURL={{host}}">Uitloggen</a>
-				-->
 			</paper-item>
 		</template>
-
-	</iron-selector>
 </iron-collapse>
 </template>
 <script>
@@ -74,39 +78,38 @@
 Polymer({
 	is: "gm-cas-icon",
 	properties: {
+		/**
+		 * Holds the account information given by CAS
+		 *
+		 * @type {{id: String, active: Boolean, displayName: String, emails: Array, groups: Array, roles: Array}}
+		*/
 		account: {
-			type: Object,
-			notify: true
+			type: Object
+
 		},
-		loggedin: {
-			type: Boolean,
-			value: false
-		},
-		host: {
-			type: String
-		},
+		/* Base url to service */
 		otap: {
 			type: String,
 			value: 'https://services.geodan.nl'
-		},
-		selected:{
-			type: Object
 		}
 	},
 	ready: function() {
+		this.host = window.location.href.split('?')[0];
 	},
 	_loginurl:  function(){
 		return this.otap + '/cas/login';
 	},
-	toggleLogin: function(){
+	_toggleLogin: function(){
 		this.$.accountmenu.toggle();
 	},
-	login: function(){
-		//this.$.cascore.login();
-	},
-	logout: function(){
+	_logout: function(){
+		/**
+		 * Fired when a logout is requested.
+		 *
+		 * @event logout
+		 *
+		*/
 		this.fire('logout');
-		//this.$.cascore.logout();
 	}
 });
 </script>

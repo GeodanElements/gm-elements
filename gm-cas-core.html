@@ -1,6 +1,15 @@
-<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+<!--
+This component will try to get your account information or will redirect you to a CAS login screen
 
-<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+Use as:
+
+    <gm-cas-core account="{{account}}"></gm-cas-core>
+
+    @demo
+-->
+
 <dom-module id="gm-cas-core">
 
 <template>
@@ -10,13 +19,6 @@
    verbose="true"
    with-credentials="true"
    on-response="_handleResponse"></iron-ajax>
-<!-- Login doesn't work like that
-<iron-ajax method="get" id="login"
-   url="https://ontw.geodan.nl/cas/login"
-   verbose="true"
-   with-credentials="true"
-   on-response="_handleLoginResponse"></iron-ajax>
-   -->
 <iron-ajax method="get" id="logout"
    url="{{_logouturl(otap)}}"
    verbose="true"
@@ -31,63 +33,63 @@
 Polymer({
 	is: "gm-cas-core",
 	properties: {
+        /**
+         * Holds the account information given by CAS
+         *
+         * @type {{id: String, active: Boolean, displayName: String, emails: Array, groups: Array, roles: Array}}
+        */
 		account: {
 			type: Object,
 			notify: true,
+            readOnly: true,
 			value: function(){return {};},
 			observer: '_accountHandler'
 		},
+        /* Whether or not user is currently logged in */
 		loggedin: {
 			type: Boolean,
 			value: false,
+            readOnly: true,
 			notify: true
 		},
-		host: {
-			type: String,
-			notify: true
-		},
+        /* Base url to service */
 		otap: {
 			type: String,
-			value: 'https://services.geodan.nl/'
-		}
+			value: 'https://services.geodan.nl'
+		},
 	},
-	_accountHandler: function(acc){
-		this.loggedin=acc.id?true:false;
-	},
+
 	ready: function() {
-		this.host = window.location.href.split('?')[0];
-		//console.log(this.host)
-  },
-  login: function(){
-  	  //login doesn't work like that
-  	  //this.$.login.generateRequest();
-  },
+
+    },
+    /**
+       * Logs you out from the CAS
+    */
+    logout: function(){
+    	  this.$.logout.generateRequest();
+    },
+    _accountHandler: function(acc){
+		this._setLoggedin(acc.id?true:false);
+	},
   _logouturl:  function(){
   	  return this.otap + '/cas/logout';
   },
   _whoamiurl: function(){
   	  return this.otap + '/accounts/details';
   },
-  logout: function(){
-  	  document.cookie = 'MOD_AUTH_CAS=; path=/;expires=Thu, 01 Jan 1970 00:00:00 GMT';
-  	  this.$.logout.generateRequest();
-  },
   _handleResponse: function(d,e) {
     if(d.detail&&d.detail.xhr&&d.detail.xhr.response) {
-        this.account = d.detail.xhr.response;
-		this.loggedin = true;
+        //Setting readonly properties
+        this._setAccount(d.detail.xhr.response);
+		this._setLoggedin(true);
     }
 
   },
-  _handleLoginResponse: function(d,e) {
-  	  if(d.detail&&d.detail.xhr&&d.detail.xhr.response) {
-    	//console.log(d.detail.xhr.response);
-      }
-  },
   _handleLogoutResponse: function(d,e) {
     if(d.detail&&d.detail.xhr) {
-        this.account = new Object;
-		this.loggedin = false;
+        //Setting readonly properties
+        this._setAccount(new Object);
+		this._setLoggedin(false);
     }
 
   }

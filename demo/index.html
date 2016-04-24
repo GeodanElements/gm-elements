@@ -1,0 +1,53 @@
+<!doctype html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <title>gm-cas-core Demo</title>
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <link rel="import" href="../gm-cas-core.html">
+    <link rel="import" href="../gm-cas-icon.html">
+    <link rel="import" href="../gm-docs-connector.html">
+    <link rel="import" href="../gm-configlist.html">
+  </head>
+  <body>
+
+    <p>An example of <code>&lt;gm-cas-core&gt;</code>:</p>
+    <template id="t" is='dom-bind'>
+        <!-- NON-UI components -->
+        <gm-cas-core
+            id='cascore'
+    		account="{{account}}"
+    		loggedin="{{loggedin}}"
+            otap="https://services.geodan.nl">
+        </gm-cas-core>
+        <gm-docs-connector id='docsconnector'
+    		account="[[account]]"
+    		configs="{{configs}}"
+    		></gm-docs-connector>
+        <!-- UI components -->
+        <gm-cas-icon
+            account="[[account]]"
+            loggedin="[[loggedin]]"
+            ></gm-cas-icon>
+        <gm-configlist name='projects'
+            configs="[[configs]]"
+            account="[[account]]"
+            selectedproject="{{selectedproject}}"
+        ></gm-configlist>
+
+
+    </template>
+    <script>
+    var t = document.querySelector('#t');
+    t.addEventListener('dom-change', function() {
+        var casicon = document.querySelector('gm-cas-icon');
+        casicon.addEventListener('logout', function(){
+            document.querySelector('#cascore').logout();
+        });
+    });
+    </script>
+
+  </body>
+</html>

@@ -19,11 +19,17 @@
     "node_modules",
     "bower_components",
     "test",
-    "tests"
+    "tests",
+    "demo"
   ],
   "dependencies": {
     "polymer": "Polymer/polymer#~1",
-    "paper-elements": "PolymerElements/paper-elements#~1",
-    "iron-elements": "PolymerElements/iron-elements#~1"
+    "paper-elements": "PolymerElements/paper-elements#^1.0.7",
+    "iron-elements": "PolymerElements/iron-elements#^1.0.10",
+    "iron-ajax": "^1.2.0"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "web-component-tester": "*"
   }
 }
