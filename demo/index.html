@@ -31,11 +31,10 @@
             account="[[account]]"
             loggedin="[[loggedin]]"
             ></gm-cas-icon>
-        <gm-configlist name='projects'
-            configs="[[configs]]"
-            account="[[account]]"
-            selectedproject="{{selectedproject}}"
-        ></gm-configlist>
+
+        <template is="dom-repeat" items="[[configs]]">
+            <div><span>{{item.title}}</span><span> {{item.description}}</span><span>{{item.service}}</span></div>
+        </template>
 
 
     </template>

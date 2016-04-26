@@ -1,8 +1,8 @@
-<link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
-<link rel="import" href="../bower_components/paper-button/paper-button.html">
-<link rel='import' href='./gm-geosearch.html'>
-
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+<!--
+@demo demo/gm-routing.html Demo showing basic routing
+-->
 <dom-module id="gm-routing">
  <style>
  </style>
@@ -12,14 +12,11 @@
         verbose="true"
         handle-as="json"
         with-credentials="true"
-        on-response="handleRoute"
-        on-error="handleError"
-		url="{{getUrl(otap)}}"
+        on-response="_handleRoute"
+        on-error="_handleError"
+		url="{{otap}}"
 		params="{{params}}"
 	></iron-ajax>
-    <gm-geosearch location='{{from}}'></gm-geosearch>
-    <gm-geosearch location='{{to}}'></gm-geosearch>
-    <paper-button on-click='calculate'>Calculate</paper-button>
  </template>
 </dom-module>
 
@@ -27,44 +24,48 @@
 Polymer({
     is: 'gm-routing',
     properties: {
-    	url: {
-    		type: String,
-    		value: '/service/route',
-    	},
+        /**
+        * Coordinates from
+        * @param [long, lat]
+        */
+        fromcoords: {
+            type: Array
+        },
+        /**
+        * Coordinates to
+        * @param [long, lat]
+        */
+        tocoords: {
+            type: Array
+        },
     	params: {
     		type: Object,
     		value: {}
     	},
+        /**  url to service */
         otap: {
             type: String,
-            value: 'prod'
+            value: "https://services.geodan.nl/routing/route"
         },
-        map: {
-            type: Object
-        },
+        /** route in geojson that has been calculated */
         route: {
+            readOnly: true,
+            notify: true,
             type: Object
         }
     },
+    observers: [
+        '_calculate(fromcoords, tocoords)'
+    ],
     ready: function(){
 
-    	//this.calculate();
     },
-    getUrl: function(otap){
-        switch(otap) {
-			case "ontw":
-				return "https://ontw.geodan.nl/routing/route";
-				break;
-			default:
-				return "https://services.geodan.nl/routing/route";
-		}
-    },
-    calculate: function(){
+    _calculate: function(){
     	this.params = {
-    		fromcoordx: this.from[0],
-    		fromcoordy: this.from[1],
-    		tocoordx: this.to[0],
-    		tocoordy: this.to[1],
+    		fromcoordx: this.fromcoords[0],
+    		fromcoordy: this.fromcoords[1],
+    		tocoordx: this.tocoords[0],
+    		tocoordy: this.tocoords[1],
     		srs: 'epsg:4326',
     		routetype: 'distance',
     		returntype: 'coords',
@@ -83,28 +84,15 @@ Polymer({
     		*/
         this.$.requestRoute.generateRequest();
     },
-    //The response from the document service will be parsed here.
-	handleRoute: function(d,e){
+	_handleRoute: function(d,e){
 		var self = this;
-        var map = this.map;
-        this.routelayer = new d3.mappu.VectorLayer('route', {
-				reproject: true,
-				style: {
-					stroke: 'orange',
-                    'stroke-width': '5px',
-					fill: 'none',
-					opacity: 1
-				}
-
-		}).addTo(map);
         var data = d.detail.xhr.response;
         if (!data.exception){
             var feat = data.features[0];
-            this.routelayer.addFeature(feat);
+            this._setRoute(feat);
         }
-        map.zoomToFeature(feat);
 	},
-    handleError: function(){
+    _handleError: function(){
     	console.warn(e.detail.xhr.statustext);
     }
 });

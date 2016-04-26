@@ -1,6 +1,11 @@
 <link rel="import"
       href="../polymer/polymer.html">
 <link rel="import" href="../iron-ajax/iron-ajax.html">
+<!--
+The connector component handles data between the document server and other components. At the moment only configuration documents are supported.
+
+@demo
+-->
 
 <dom-module id="gm-docs-connector">
 	<template>
@@ -11,23 +16,27 @@
 		verbose="true"
 		handle-as="json"
 		with-credentials="true"
-		on-response="handleList"
-		on-error="handleError"></iron-ajax>
+		on-response="_handleList"
+		on-error="_handleError"></iron-ajax>
 	</template>
 </dom-module>
 <script>
-  // register a new element called proto-element
+
   Polymer({
     is: "gm-docs-connector",
 	properties: {
+        /** Account from gm-cas */
 		account: {
 			type: Object,
 			observer: '_accountHandler'
 		},
+        /** Array of configurations from document server*/
 		configs: {
 			type: Array,
-			notify: true
+			notify: true,
+            readOnly: true
 		},
+        /** URL to service */
 		otap: {
 		  type: String,
 		  value: 'https://services.geodan.nl'
@@ -39,19 +48,21 @@
 		}
 	},
     // add a callback to the element's prototype
-	handleList: function(d){
+	_handleList: function(d){
 		this.documents =d.detail.xhr.response;
 		this.error = '';
-		this.configs = this.documents.filter(function(d){
+		var configs = this.documents.filter(function(d){
 			return d.service == 'config';
 		});
+        this._setConfigs(configs);
 	},
-	handleError: function(e){
+	_handleError: function(e){
 		if(e.detail.request.xhr.status==404) {
 			this.error = "Er zijn geen documenten gevonden"
 		}
 	},
-	makeUrl: function(item){
+    /*
+	_makeUrl: function(item){
 		if(item.public) {
 			var url = this.baseUrl + '/public/document/'+ this.account.groups[0].value + '/api/data/'+this.account.groups[0].value +'/'+item.service+'/'+item.name;
 			return url
@@ -59,7 +70,7 @@
 		else {
 			return this.baseUrl + '/document/api/data/'+this.account.groups[0].value +'/'+item.service+'/'+item.name;
 		}
-	},
+	},*/
     ready: function() {
 		this.account = this.account || {};
 		this.baseUrl = this.otap;
