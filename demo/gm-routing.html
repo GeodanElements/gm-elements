@@ -1,0 +1,49 @@
+<!doctype html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <title>gm-cas-core Demo</title>
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <link rel="import" href="../gm-cas-core.html">
+    <link rel="import" href="../gm-cas-icon.html">
+    <link rel="import" href="../gm-routing.html">
+  </head>
+  <body>
+
+    <p>An example of <code>&lt;gm-routing&gt;</code>:</p>
+    <template id="t" is='dom-bind'>
+        <!-- NON-UI components -->
+        <gm-cas-core
+            id='cascore'
+    		account="{{account}}"
+    		loggedin="{{loggedin}}"
+            otap="https://services.geodan.nl">
+        </gm-cas-core>
+        <gm-cas-icon
+            account="[[account]]"
+            loggedin="[[loggedin]]"
+            ></gm-cas-icon>
+        Login: {{account.id}}
+        <gm-routing fromcoords=[4.91311,52.3423] tocoords=[5.2996,51.69176] route="{{route}}"></gm-routing>
+        <div>Route:
+            {{_showroute(route)}}
+        </div>
+    </template>
+    <script>
+    var t = document.querySelector('#t');
+    t.addEventListener('dom-change', function() {
+        this._showroute = function(route){
+            return JSON.stringify(route);
+        }
+
+        var casicon = document.querySelector('gm-cas-icon');
+        casicon.addEventListener('logout', function(){
+            document.querySelector('#cascore').logout();
+        });
+    });
+    </script>
+
+  </body>
+</html>

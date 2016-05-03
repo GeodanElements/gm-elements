@@ -51,10 +51,12 @@ The connector component handles data between the document server and other compo
 	_handleList: function(d){
 		this.documents =d.detail.xhr.response;
 		this.error = '';
-		var configs = this.documents.filter(function(d){
-			return d.service == 'config';
-		});
-        this._setConfigs(configs);
+        if (this.documents){
+    		var configs = this.documents.filter(function(d){
+    			return d.service == 'config';
+    		});
+            this._setConfigs(configs);
+        }
 	},
 	_handleError: function(e){
 		if(e.detail.request.xhr.status==404) {
