@@ -1,6 +1,6 @@
 {
   "name": "gm-elements",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "homepage": "https://github.com/GeodanElements/gm-elements",
   "description": "Polymer implementation for geodanmaps",
   "keywords": [
@@ -25,8 +25,7 @@
   "dependencies": {
     "polymer": "Polymer/polymer#~1",
     "paper-elements": "PolymerElements/paper-elements#~1",
-    "iron-elements": "PolymerElements/iron-elements#~1",
-    "iron-ajax": "^1.2.0"
+    "iron-elements": "PolymerElements/iron-elements#~1"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#~1",
