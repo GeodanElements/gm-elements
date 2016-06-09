@@ -1,0 +1,118 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-item/paper-item.html">
+<link rel="import" href="../paper-item/paper-item-body.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../iron-selector/iron-selector.html">
+<link rel="import" href="../iron-icons/social-icons.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
+<link rel="import" href="../iron-collapse/iron-collapse.html">
+
+<dom-module id="gm-cas-icon">
+	<!--
+	This component will show you a simple account overview based on material design
+	Use as:
+
+	    <gm-cas-icon account="[[account]]"></gm-cas-icon>
+
+	@demo
+	-->
+<style>
+.header {
+	padding: 10px;
+	cursor: pointer;
+}
+#accountmenu {
+	background: white;
+	color: black;
+	margin: 0px;
+	cursor: pointer;
+}
+
+#accountmenu a {
+	text-decoration: none;
+}
+paper-item {
+	max-width: 250px;
+}
+
+</style>
+<template>
+<paper-item class='header' on-click='_toggleLogin'>
+	<template is="dom-if" if="[[!loggedin]]">
+		<paper-item-body two-line>
+			<div>Login</div>
+			<div secondary>U bent niet ingelogd</div>
+		</paper-item-body>
+		<iron-icon icon="social:person-outline" ></iron-icon>
+	</template>
+
+	<template is="dom-if" if="[[loggedin]]">
+		<paper-item-body two-line>
+			<div>{{account.displayName}}</div>
+			<div secondary>{{account.id}}</div>
+			<!-- not working in new accounting
+			<div secondary>{{account.Organisation}}, {{account.Department}}</div>
+			-->
+		</paper-item-body>
+		<iron-icon icon="icons:account-circle"></iron-icon>
+	</template>
+
+</paper-item>
+<iron-collapse id="accountmenu" class='collapse-content' opened="[[!loggedin]]">
+
+		<template is="dom-if" if="[[!loggedin]]">
+			<paper-item class='menu' name='login'>
+				<a href="{{_loginurl(otap)}}?service={{host}}">Inloggen</a>
+			</paper-item>
+		</template>
+
+		<template is="dom-if" if="[[loggedin]]">
+			<paper-item class='menu' name='logout' on-click='_logout'>
+				Uitloggen
+			</paper-item>
+		</template>
+</iron-collapse>
+</template>
+<script>
+
+Polymer({
+	is: "gm-cas-icon",
+	properties: {
+		/**
+		 * Holds the account information given by CAS
+		 *
+		 * @type {{id: String, active: Boolean, displayName: String, emails: Array, groups: Array, roles: Array}}
+		*/
+		account: {
+			type: Object
+
+		},
+		/* Base url to service */
+		otap: {
+			type: String,
+			value: 'https://services.geodan.nl'
+		}
+	},
+	ready: function() {
+		this.host = window.location.href.split('?')[0];
+	},
+	_loginurl:  function(){
+		return this.otap + '/cas/login';
+	},
+	_toggleLogin: function(){
+		this.$.accountmenu.toggle();
+	},
+	_logout: function(){
+		/**
+		 * Fired when a logout is requested.
+		 *
+		 * @event logout
+		 *
+		*/
+		this.fire('logout');
+	}
+});
+</script>
+
+
+</dom-module>

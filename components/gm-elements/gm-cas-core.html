@@ -1,0 +1,100 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+<!--
+This component will try to get your account information or will redirect you to a CAS login screen
+
+Use as:
+
+    <gm-cas-core account="{{account}}"></gm-cas-core>
+
+    @demo
+-->
+
+<dom-module id="gm-cas-core">
+
+<template>
+<iron-ajax method="get" id="ajaxRequest"
+   auto
+   url="{{_whoamiurl(otap)}}"
+   verbose="true"
+   with-credentials="true"
+   on-response="_handleResponse"></iron-ajax>
+<iron-ajax method="get" id="logout"
+   url="{{_logouturl(otap)}}"
+   verbose="true"
+   with-credentials="true"
+   on-response="_handleLogoutResponse"></iron-ajax>
+
+</template>
+
+</template>
+<script>
+
+Polymer({
+	is: "gm-cas-core",
+	properties: {
+        /**
+         * Holds the account information given by CAS
+         *
+         * @type {{id: String, active: Boolean, displayName: String, emails: Array, groups: Array, roles: Array}}
+        */
+		account: {
+			type: Object,
+			notify: true,
+            readOnly: true,
+			value: function(){return {};},
+			observer: '_accountHandler'
+		},
+        /* Whether or not user is currently logged in */
+		loggedin: {
+			type: Boolean,
+			value: false,
+            readOnly: true,
+			notify: true
+		},
+        /* Base url to service */
+		otap: {
+			type: String,
+			value: 'https://services.geodan.nl'
+		},
+	},
+
+	ready: function() {
+
+    },
+    /**
+       * Logs you out from the CAS
+    */
+    logout: function(){
+    	  this.$.logout.generateRequest();
+    },
+    _accountHandler: function(acc){
+		this._setLoggedin(acc.id?true:false);
+	},
+  _logouturl:  function(){
+  	  return this.otap + '/cas/logout';
+  },
+  _whoamiurl: function(){
+  	  return this.otap + '/accounts/details';
+  },
+  _handleResponse: function(d,e) {
+    if(d.detail&&d.detail.xhr&&d.detail.xhr.response) {
+        //Setting readonly properties
+        this._setAccount(d.detail.xhr.response);
+		this._setLoggedin(true);
+    }
+
+  },
+  _handleLogoutResponse: function(d,e) {
+    if(d.detail&&d.detail.xhr) {
+        //Setting readonly properties
+        this._setAccount(new Object);
+		this._setLoggedin(false);
+    }
+
+  }
+  });
+</script>
+
+
+</dom-module>

@@ -1,0 +1,99 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+<!--
+@demo demo/gm-routing.html Demo showing basic routing
+-->
+<dom-module id="gm-routing">
+ <style>
+ </style>
+ <template>
+ 	<iron-ajax
+        id='requestRoute'
+        verbose="true"
+        handle-as="json"
+        with-credentials="true"
+        on-response="_handleRoute"
+        on-error="_handleError"
+		url="{{otap}}"
+		params="{{params}}"
+	></iron-ajax>
+ </template>
+</dom-module>
+
+<script>
+Polymer({
+    is: 'gm-routing',
+    properties: {
+        /**
+        * Coordinates from
+        * @param [long, lat]
+        */
+        fromcoords: {
+            type: Array
+        },
+        /**
+        * Coordinates to
+        * @param [long, lat]
+        */
+        tocoords: {
+            type: Array
+        },
+    	params: {
+    		type: Object,
+    		value: {}
+    	},
+        /**  url to service */
+        otap: {
+            type: String,
+            value: "https://services.geodan.nl/routing/route"
+        },
+        /** route in geojson that has been calculated */
+        route: {
+            readOnly: true,
+            notify: true,
+            type: Object
+        }
+    },
+    observers: [
+        '_calculate(fromcoords, tocoords)'
+    ],
+    ready: function(){
+
+    },
+    _calculate: function(){
+    	this.params = {
+    		fromcoordx: this.fromcoords[0],
+    		fromcoordy: this.fromcoords[1],
+    		tocoordx: this.tocoords[0],
+    		tocoordy: this.tocoords[1],
+    		srs: 'epsg:4326',
+    		routetype: 'distance',
+    		returntype: 'coords',
+    		outputformat: 'json'
+    	}
+    	/*
+    	http://services.geodan.nl/routing/route?
+    		fromcoordx=4.91311&
+    		fromcoordy=52.34232&
+    		tocoordx=5.29969&
+    		tocoordy=51.69176&
+    		srs=epsg:4326&
+    		routetype=cost&
+    		returntype=coords&
+    		outputformat=json
+    		*/
+        this.$.requestRoute.generateRequest();
+    },
+	_handleRoute: function(d,e){
+		var self = this;
+        var data = d.detail.xhr.response;
+        if (!data.exception){
+            var feat = data.features[0];
+            this._setRoute(feat);
+        }
+	},
+    _handleError: function(){
+    	console.warn(e.detail.xhr.statustext);
+    }
+});
+</script>
