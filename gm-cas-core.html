@@ -19,6 +19,8 @@ Use as:
    verbose="true"
    with-credentials="true"
    on-response="_handleResponse"></iron-ajax>
+
+
 <iron-ajax method="get" id="logout"
    url="{{_logouturl(otap)}}"
    verbose="true"
@@ -75,7 +77,7 @@ Polymer({
   	  return this.otap + '/cas/logout';
   },
   _whoamiurl: function(){
-  	  return this.otap + '/accounts/details';
+  	  return this.otap + '/accounts/details?at=s2';
   },
   _handleResponse: function(d,e) {
     if(d.detail&&d.detail.xhr&&d.detail.xhr.response) {

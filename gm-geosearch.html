@@ -5,6 +5,8 @@
 <link rel="import" href="../paper-input/paper-input.html">
 <link rel="import" href="../paper-item/paper-item.html">
 <link rel="import" href="../paper-item/paper-item-body.html">
+<script type="text/javascript" src="../terraformer/terraformer.min.js"></script>
+<script type="text/javascript" src="../terraformer-wkt-parser/terraformer-wkt-parser.min.js"></script>
 
 <dom-module id="gm-geosearch">
 <style>
@@ -67,8 +69,18 @@ paper-item {
             value: 'prod'
         },
         location: {
+        	//deprecated
             type: Object,
             notify: true
+        },
+        lastLocation: {
+        	//to replace location
+        	type: Object,
+        	notify: true
+        },
+        lastBoundary: {
+        	type: Object,
+        	notify: true
         }
 	},
 	_getlocation: function(e){
@@ -87,9 +99,12 @@ paper-item {
 		this.error = '';
 		var l = documents.response.docs[0];
 		var center = l.centroid[0].replace('POINT(','').replace(')','').split(' ');
-		this.fire('goto-coords',[parseFloat(center[0]),parseFloat(center[1])]);
+		var boundary = Terraformer.WKT.parse(l.geom);
         this.suggestions = [];
 		this.location = [parseFloat(center[0]),parseFloat(center[1])];
+		this.lastLocation = this.location;
+		this.lastBoundary = boundary;
+		this.fire('goto-coords',[parseFloat(center[0]),parseFloat(center[1])]);
 	},
 	handleError: function(e){
 		if(e.detail.request.xhr.status==404) {
