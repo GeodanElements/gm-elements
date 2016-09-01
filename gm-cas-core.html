@@ -77,7 +77,7 @@ Polymer({
   	  return this.otap + '/cas/logout';
   },
   _whoamiurl: function(){
-  	  return this.otap + '/accounts/details?at=s2';
+  	  return this.otap + '/accounts/details';
   },
   _handleResponse: function(d,e) {
     if(d.detail&&d.detail.xhr&&d.detail.xhr.response) {

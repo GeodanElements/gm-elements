@@ -68,7 +68,7 @@ paper-item {
 
 		<template is="dom-if" if="[[loggedin]]">
 			<paper-item class='menu' name='logout' on-click='_logout'>
-				Uitloggen
+				<a href="{{_logouturl(otap)}}?service={{host}}">Uitloggen</a>
 			</paper-item>
 		</template>
 </iron-collapse>
@@ -98,6 +98,9 @@ Polymer({
 	},
 	_loginurl:  function(){
 		return this.otap + '/cas/login';
+	},
+	_logouturl:  function(){
+		return this.otap + '/cas/logout';
 	},
 	_toggleLogin: function(){
 		this.$.accountmenu.toggle();

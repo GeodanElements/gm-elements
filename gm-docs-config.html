@@ -2,22 +2,23 @@
       href="../polymer/polymer.html">
 <link rel="import" href="../iron-ajax/iron-ajax.html">
 <!--
-The connector component handles data between the document server and other components. At the moment only configuration documents are supported.
+The config component reads a config from the gm document service and splits it into layers and other objects
 
 @demo
 -->
 
-<dom-module id="gm-docs-connector">
+<dom-module id="gm-docs-config">
 	<template>
 		<iron-ajax
 		auto
-		url="{{listUrl}}"
-		id="getList"
+		url="{{configUrl}}"
+		id="getConfig"
 		verbose="true"
 		handle-as="json"
 		with-credentials="true"
-		on-response="_handleList"
+		on-response="_handleConfig"
 		on-error="_handleError"></iron-ajax>
+		<!--
 		<iron-ajax
 		auto
 		url="{{layersUrl}}"
@@ -27,23 +28,26 @@ The connector component handles data between the document server and other compo
 		with-credentials="true"
 		on-response="_handleLayers"
 		on-error="_handleError"></iron-ajax>
+		-->
 	</template>
 </dom-module>
 <script>
 
   Polymer({
-    is: "gm-docs-connector",
+    is: "gm-docs-config",
 	properties: {
         /** Account from gm-cas */
 		account: {
-			type: Object,
-			observer: '_accountHandler'
+			type: Object
 		},
-        /** Array of configurations from document server*/
-		configs: {
-			type: Array,
-			notify: true,
-            //readOnly: true
+		/** Configname, used for getting the right configuration from the document service */
+		configname: {
+			type: String
+		},
+		/** Configuration object */
+		config: {
+			type: Object,
+			notify: true
 		},
 		/** Array of layers from document server*/
 		layers: {
@@ -57,22 +61,21 @@ The connector component handles data between the document server and other compo
 		  value: 'https://services.geodan.nl'
 		}
 	},
-	_accountHandler: function(acc){
+	observers: [
+		'_accountHandler(account, baseUrl, configname)'
+	],
+	_accountHandler: function(acc, baseUrl, configname){
 		if(acc.id) {
-			this.listUrl = this.baseUrl + "/document/api/"+ acc.groups[0].value + "/config/";
-			this.layersUrl = this.baseUrl + "/data/publication/"+ acc.groups[0].value + "/layers/";
+			this.configUrl = baseUrl + "/document/api/data/"+ acc.groups[0].value + "/config/" + configname;
 		}
 	},
-    // add a callback to the element's prototype
-	_handleList: function(d){
+	_handleConfig: function(d){
 		this.documents =d.detail.xhr.response;
 		this.error = '';
         if (this.documents){
-    		var configs = this.documents.filter(function(d){
-    			return d.service == 'config';
-    		});
-            //this._setConfigs(configs);
-            this.configs = configs;
+    		var config = this.documents;
+            this.config = config;
+            this.layers = config.map.layers;
         }
 	},
 	_handleLayers: function(d){
