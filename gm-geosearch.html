@@ -105,6 +105,9 @@ paper-item {
 		this.lastLocation = this.location;
 		this.lastBoundary = boundary;
 		this.fire('goto-coords',[parseFloat(center[0]),parseFloat(center[1])]);
+		
+		var center = l.centroid_rd[0].replace('POINT(','').replace(')','').split(' ');
+		this.fire('goto-rdcoords',[parseFloat(center[0]),parseFloat(center[1])]);
 	},
 	handleError: function(e){
 		if(e.detail.request.xhr.status==404) {
